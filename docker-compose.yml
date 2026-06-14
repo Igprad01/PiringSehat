@@ -10,4 +10,6 @@ services:
       - "8080:3000"
     environment:
       - NODE_ENV=production
+    env_file:
+      - .env.local
     restart: always
