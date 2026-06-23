@@ -6,10 +6,13 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  // cacheComponents: true,
   experimental: {
     cpus: 1,
     workerThreads: false,
   },
+
+
 };
 
 

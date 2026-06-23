@@ -5,9 +5,8 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
     try {
         const body = await request.json();
-        const { nama_makanan, kategori_id, porsi, kadar_gizi, satuan_gizi, ...lemakData } = body;
+        const { nama_makanan, kategori_id, porsi, kadar_gizi, satuan_gizi, lemakData } = body;
 
-        // 3. Insert Utama
         const { data: makananData, error: makananError } = await supabase
             .from("makanan")
             .insert({
@@ -26,9 +25,8 @@ export async function POST(request: NextRequest) {
 
         const id_makanan = makananData.id;
 
-        // 5. Cek Kategori Form
         if (kategori_id === 2) {
-            // Ya - Kategori Lemak
+          
             const { error: lemakError } = await supabase
                 .from("rincian_lemak")
                 .insert({
@@ -41,7 +39,6 @@ export async function POST(request: NextRequest) {
                 });
 
             if (lemakError) {
-                // Should we rollback or just return error? For simple flow return error.
                 return NextResponse.json({ error: lemakError.message }, { status: 500 });
             }
         }
@@ -59,8 +56,24 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const url = new URL(request.url);
     const kategori_id = url.searchParams.get("kategori_id");
-
-    let query = supabase.from("makanan").select("*, rincian_lemak(*)");
+    let query = supabase
+        .from("makanan")
+        .select(`
+            id_makanan, 
+            kategori_id, 
+            nama_makanan, 
+            kadar, 
+            satuan,
+            rincian_lemak (
+                id_rincian_lemak,
+                lemak_total,
+                lemak_jenuh,
+                lemak_tak_jenuh_tunggal,
+                lemak_tak_jenuh_ganda,
+                keterangan_omega
+            )
+        `)
+        .limit(50); 
 
     if (kategori_id) {
         query = query.eq("kategori_id", kategori_id);
