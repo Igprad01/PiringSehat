@@ -5,7 +5,14 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
     try {
         const body = await request.json();
-        const { nama_makanan, kategori_id, porsi, kadar_gizi, satuan_gizi, lemakData } = body;
+        const { 
+            nama_makanan, 
+            kategori_id, 
+            porsi, 
+            kadar_gizi: kadar, 
+            satuan_gizi: satuan, 
+            lemakData 
+        } = body;
 
         const { data: makananData, error: makananError } = await supabase
             .from("makanan")
@@ -13,29 +20,27 @@ export async function POST(request: NextRequest) {
                 nama_makanan,
                 kategori_id,
                 porsi,
-                kadar_gizi,
-                satuan_gizi
+                kadar, 
+                satuan
             })
-            .select("id")
+            .select("id_makanan")
             .single();
 
         if (makananError) {
             return NextResponse.json({ error: makananError.message }, { status: 500 });
         }
 
-        const id_makanan = makananData.id;
+        const id_makanan = makananData.id_makanan;
 
         if (kategori_id === 2) {
           
             const { error: lemakError } = await supabase
                 .from("rincian_lemak")
                 .insert({
-                    id_makanan,
+                    makanan_id: id_makanan,
                     lemak_jenuh: lemakData.lemak_jenuh || 0,
                     lemak_tak_jenuh_ganda: lemakData.lemak_tak_jenuh_ganda || 0,
                     lemak_tak_jenuh_tunggal: lemakData.lemak_tak_jenuh_tunggal || 0,
-                    lemak_trans: lemakData.lemak_trans || 0,
-                    kolesterol: lemakData.kolesterol || 0
                 });
 
             if (lemakError) {
@@ -64,6 +69,7 @@ export async function GET(request: NextRequest) {
             nama_makanan, 
             kadar, 
             satuan,
+            kelompok,
             rincian_lemak (
                 id_rincian_lemak,
                 lemak_total,
@@ -73,8 +79,7 @@ export async function GET(request: NextRequest) {
                 keterangan_omega
             )
         `)
-        .limit(50); 
-
+        .order('nama_makanan', { ascending: true }); 
     if (kategori_id) {
         query = query.eq("kategori_id", kategori_id);
     }

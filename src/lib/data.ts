@@ -13,6 +13,7 @@ export async function getMakanan() {
             nama_makanan, 
             kadar, 
             satuan,
+            kelompok,
             rincian_lemak (
                 id_rincian_lemak,
                 lemak_total,
@@ -22,7 +23,7 @@ export async function getMakanan() {
                 keterangan_omega
             )
         `)
-        .limit(50);
+        .order('nama_makanan', { ascending: true });
 
     if (error) {
         console.error("Error fetching makanan:", error);

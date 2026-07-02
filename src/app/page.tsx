@@ -12,7 +12,7 @@ export default async function DashboardUtama() {
   const stats = await getStats();
 
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen bg-gray-100 dark:bg-slate-950 p-8 transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
         <DashboardClient stats={stats}>
           <Suspense fallback={<div className="text-center p-4"></div>}>

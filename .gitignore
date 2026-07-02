@@ -45,4 +45,6 @@ next-env.d.ts
 
 .next./
 
+.skills-lock.json
 
+.skills/
